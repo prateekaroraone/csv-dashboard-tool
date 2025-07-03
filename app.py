@@ -11,7 +11,7 @@ if uploaded_file:
     df = pd.read_csv(uploaded_file, parse_dates=["Date"])
 
     st.subheader("Raw Data")
-    st.dataframe(df)
+    st.dataframe(df) 
 
     st.subheader("Key Metrics")
     col1, col2, col3 = st.columns(3)
