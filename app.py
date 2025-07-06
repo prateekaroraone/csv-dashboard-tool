@@ -2,53 +2,75 @@ import streamlit as st
 import pandas as pd
 import altair as alt
 
-# Page settings
-st.set_page_config(page_title="📊 CSV Dashboard Generator", layout="wide")
-st.title("📊 CSV Dashboard Generator")
-st.markdown("Upload your CSV file to get instant summaries, charts, and insights.")
+# Page configuration
+st.set_page_config(page_title="📊 Charity CSV Dashboard", layout="wide")
+st.title("📊 Charity CSV Dashboard")
+st.markdown("Upload your CSV file from the **sidebar** to instantly explore your charity data!")
 
-# Define required schema
+# Required columns for validation
 REQUIRED_COLUMNS = ["Date", "Amount", "Category"]
 
-# Sample download button
+# 🔹 Main Page: Instructions and Sample Download
+st.header("📌 How to Prepare Your CSV File")
+
+st.markdown("""
+Ensure your file includes the following **three columns**:
+
+- `Date`: e.g., `2024-01-10`  
+- `Amount`: e.g., `1000` (in GBP)  
+- `Category`: e.g., `Fundraising`, `Operations`, etc.
+
+✅ Format:
+- Must be **comma-separated (.csv)**
+- Dates must be in **YYYY-MM-DD** format
+- No empty rows or unnamed columns
+
+Download an example below:
+""")
+
+# Downloadable sample CSV
+sample_df = pd.DataFrame({
+    "Date": ["2024-01-10", "2024-02-15", "2024-02-25"],
+    "Amount": [1000, 500, 1500],
+    "Category": ["Fundraising", "Operations", "Programs"]
+})
+st.download_button("📥 Download Sample CSV", sample_df.to_csv(index=False), file_name="sample_charity.csv", mime="text/csv")
+
+# 🔸 Sidebar: File Upload
 with st.sidebar:
-    st.header("📥 Sample CSV")
-    sample_df = pd.DataFrame({
-        "Date": ["2024-01-10", "2024-02-15", "2024-02-25"],
-        "Amount": [1000, 500, 1500],
-        "Category": ["Fundraising", "Operations", "Programs"]
-    })
-    st.download_button("Download Sample CSV", sample_df.to_csv(index=False), file_name="sample.csv", mime="text/csv")
+    st.header("📂 Upload Your CSV")
+    uploaded_file = st.file_uploader("Upload CSV File", type=["csv"])
 
-# File uploader
-uploaded_file = st.file_uploader("Upload your CSV file", type=["csv"])
-
+# 🔍 Data Processing
 if uploaded_file:
     try:
         df = pd.read_csv(uploaded_file)
 
-        # Check for required columns
+        # Check required columns
         missing_cols = [col for col in REQUIRED_COLUMNS if col not in df.columns]
         if missing_cols:
-            st.error(f"Missing required columns: {missing_cols}")
+            st.error(f"❌ Missing required columns: {missing_cols}")
             st.stop()
 
-        # Convert Date column
+        # Parse dates
         df["Date"] = pd.to_datetime(df["Date"], errors="coerce")
         df = df.dropna(subset=["Date"])
 
+        # ✅ Success message
         st.success("✅ File loaded successfully!")
-        st.subheader("🔎 Data Preview")
+
+        # 🔎 Preview Data
+        st.subheader("📋 Data Preview")
         st.dataframe(df)
 
-        # Summary stats
-        st.subheader("📈 Summary Statistics")
-        st.metric("Total Transactions", len(df))
+        # 📊 Summary Metrics
+        st.subheader("📊 Summary Metrics")
+        st.metric("Total Records", len(df))
         st.metric("Total Amount", f"£{df['Amount'].sum():,.2f}")
         st.metric("Average Amount", f"£{df['Amount'].mean():,.2f}")
 
-        # Visualisation: Amount over time
-        st.subheader("📅 Amount Over Time")
+        # 📅 Line Chart
+        st.subheader("📈 Amount Over Time")
         line_chart = alt.Chart(df).mark_line().encode(
             x="Date:T",
             y="Amount:Q",
@@ -56,16 +78,16 @@ if uploaded_file:
         ).interactive()
         st.altair_chart(line_chart, use_container_width=True)
 
-        # Visualisation: Category breakdown
-        st.subheader("📊 Spending by Category")
-        category_chart = alt.Chart(df).mark_bar().encode(
+        # 📂 Bar Chart
+        st.subheader("📊 Category Breakdown")
+        bar_chart = alt.Chart(df).mark_bar().encode(
             x="Category:N",
             y="sum(Amount):Q",
             tooltip=["Category", "sum(Amount)"]
         ).interactive()
-        st.altair_chart(category_chart, use_container_width=True)
+        st.altair_chart(bar_chart, use_container_width=True)
 
     except Exception as e:
-        st.error(f"❌ Error reading file: {e}")
+        st.error(f"❌ Error processing file: {e}")
 else:
-    st.info("👈 Upload a CSV file to get started.")
+    st.info("👈 Please upload a valid CSV file using the sidebar.")
