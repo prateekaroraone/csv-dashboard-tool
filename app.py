@@ -3,9 +3,9 @@ import pandas as pd
 import altair as alt
 
 # Page configuration
-st.set_page_config(page_title="📊 Charity CSV Dashboard", layout="wide")
-st.title("📊 Charity CSV Dashboard")
-st.markdown("Upload your CSV file from the **sidebar** to instantly explore your charity data!")
+st.set_page_config(page_title="📊 CSV Dashboard Generator", layout="wide")
+st.title("📊 CSV Dashboard Generator")
+st.markdown("Upload your CSV file from the **sidebar** to instantly explore your data!")
 
 # Required columns for validation
 REQUIRED_COLUMNS = ["Date", "Amount", "Category"]
@@ -34,7 +34,7 @@ sample_df = pd.DataFrame({
     "Amount": [1000, 500, 1500],
     "Category": ["Fundraising", "Operations", "Programs"]
 })
-st.download_button("📥 Download Sample CSV", sample_df.to_csv(index=False), file_name="sample_charity.csv", mime="text/csv")
+st.download_button("📥 Download Sample CSV", sample_df.to_csv(index=False), file_name="sample.csv", mime="text/csv")
 
 # 🔸 Sidebar: File Upload
 with st.sidebar:
