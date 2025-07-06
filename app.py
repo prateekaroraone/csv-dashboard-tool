@@ -1,40 +1,71 @@
 import streamlit as st
 import pandas as pd
-import plotly.express as px
+import altair as alt
 
-st.set_page_config(page_title="Charity Donation Dashboard", layout="wide")
-st.title("📊 Charity Donation Dashboard")
+# Page settings
+st.set_page_config(page_title="📊 CSV Dashboard Generator", layout="wide")
+st.title("📊 CSV Dashboard Generator")
+st.markdown("Upload your CSV file to get instant summaries, charts, and insights.")
 
-uploaded_file = st.sidebar.file_uploader("Upload your charity CSV file", type=["csv"])
+# Define required schema
+REQUIRED_COLUMNS = ["Date", "Amount", "Category"]
 
-if uploaded_file is not None:
-    df = pd.read_csv(uploaded_file)
+# Sample download button
+with st.sidebar:
+    st.header("📥 Sample CSV")
+    sample_df = pd.DataFrame({
+        "Date": ["2024-01-10", "2024-02-15", "2024-02-25"],
+        "Amount": [1000, 500, 1500],
+        "Category": ["Fundraising", "Operations", "Programs"]
+    })
+    st.download_button("Download Sample CSV", sample_df.to_csv(index=False), file_name="sample.csv", mime="text/csv")
 
-    df["Date"] = pd.to_datetime(df["Date"], errors='coerce')
-    df = df.dropna(subset=["Date"])
-    df["Month"] = df["Date"].dt.to_period("M").astype(str)
+# File uploader
+uploaded_file = st.file_uploader("Upload your CSV file", type=["csv"])
 
-    campaigns = ["All"] + sorted(df["Campaign"].unique().tolist())
-    selected_campaign = st.sidebar.selectbox("Select Campaign", campaigns)
+if uploaded_file:
+    try:
+        df = pd.read_csv(uploaded_file)
 
-    if selected_campaign != "All":
-        df = df[df["Campaign"] == selected_campaign]
+        # Check for required columns
+        missing_cols = [col for col in REQUIRED_COLUMNS if col not in df.columns]
+        if missing_cols:
+            st.error(f"Missing required columns: {missing_cols}")
+            st.stop()
 
-    total_raised = df["Amount"].sum()
-    num_donations = df.shape[0]
-    avg_donation = df["Amount"].mean()
+        # Convert Date column
+        df["Date"] = pd.to_datetime(df["Date"], errors="coerce")
+        df = df.dropna(subset=["Date"])
 
-    col1, col2, col3 = st.columns(3)
-    col1.metric("💰 Total Raised", f"£{total_raised:,.2f}")
-    col2.metric("🧾 Number of Donations", num_donations)
-    col3.metric("📊 Average Donation", f"£{avg_donation:,.2f}")
+        st.success("✅ File loaded successfully!")
+        st.subheader("🔎 Data Preview")
+        st.dataframe(df)
 
-    monthly_totals = df.groupby("Month")["Amount"].sum().reset_index()
-    fig = px.bar(monthly_totals, x="Month", y="Amount", title="Monthly Donation Totals", labels={"Amount": "£ Amount"})
-    st.plotly_chart(fig, use_container_width=True)
+        # Summary stats
+        st.subheader("📈 Summary Statistics")
+        st.metric("Total Transactions", len(df))
+        st.metric("Total Amount", f"£{df['Amount'].sum():,.2f}")
+        st.metric("Average Amount", f"£{df['Amount'].mean():,.2f}")
 
-    st.subheader("📋 Donation Data")
-    st.dataframe(df.sort_values("Date", ascending=False))
+        # Visualisation: Amount over time
+        st.subheader("📅 Amount Over Time")
+        line_chart = alt.Chart(df).mark_line().encode(
+            x="Date:T",
+            y="Amount:Q",
+            tooltip=["Date", "Amount"]
+        ).interactive()
+        st.altair_chart(line_chart, use_container_width=True)
 
+        # Visualisation: Category breakdown
+        st.subheader("📊 Spending by Category")
+        category_chart = alt.Chart(df).mark_bar().encode(
+            x="Category:N",
+            y="sum(Amount):Q",
+            tooltip=["Category", "sum(Amount)"]
+        ).interactive()
+        st.altair_chart(category_chart, use_container_width=True)
+
+    except Exception as e:
+        st.error(f"❌ Error reading file: {e}")
 else:
-    st.info("Please upload a CSV file to see the dashboard.")
+    st.info("👈 Upload a CSV file to get started.")
