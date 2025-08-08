@@ -1,5 +1,8 @@
-![CI](https://github.com/prateekaroraone/csv-dashboard-tool/actions/workflows/ci.yml/badge.svg)
+[![Stars](https://img.shields.io/github/stars/prateekaroraone/csv-dashboard-tool?style=social)](https://github.com/prateekaroraone/csv-dashboard-tool/stargazers)
 
+![License](https://img.shields.io/badge/license-MIT-brightgreen)
+
+[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://csvdashboard.streamlit.app/)
 
 #  CSV Dashboard Converter
 
