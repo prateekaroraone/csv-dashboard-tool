@@ -1,21 +1,45 @@
-# Charity CSV Dashboard
+![CI](https://github.com/prateekaroraone/csv-dashboard-tool/actions/workflows/ci.yml/badge.svg)
 
-📊 A simple Streamlit app to help charities turn raw donation data into insights — instantly.
 
-## 🚀 Features
+#  CSV Dashboard Converter
 
-- Upload donation CSV
-- View key metrics: total raised, donors, campaigns
-- Charts: donations over time, top donors, campaign breakdown
-- Clean, fast, easy to use
 
-## 🧪 Sample CSV Format
+> 📊 **A no-code, interactive CSV data dashboard** built for business leaders, techs, and small teams.  
+> Upload, explore, and visualise your CSV data in seconds — without Excel headaches.
 
-| Donor | Amount | Date | Campaign |
-|-------|--------|------|----------|
-| Alice | 100    | 2024-01-15 | Winter Appeal |
+---
 
-## ▶️ Run the App
+## 🚀 Quick Demo
 
+![CSV Dashboard Demo](demo.gif)  
+<sub>*GIF showing CSV upload → instant charts — replace `demo.gif` with your own*</sub>
+
+---
+
+## ✨ Features
+- **📂 Drag-and-drop CSV upload** — no technical skills required.
+- **📈 Instant charts & tables** — auto-generated from your data.
+- **🔍 Search & filter** — quickly find what matters.
+- **📤 Export insights** — download processed data for sharing.
+- **🌍 Designed for simplicity** — focuses on simplicity, accessibility, and clarity.
+
+---
+
+## 🛠 How to Use
+
+### 1️⃣ Try It Online  
+[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://csvdashboard.streamlit.app/)
+
+---
+
+### 2️⃣ Run Locally
 ```bash
+# Clone the repo
+git clone https://github.com/emfactor/charity-csv-dashboard.git
+cd charity-csv-dashboard
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Run the app
 streamlit run app.py
